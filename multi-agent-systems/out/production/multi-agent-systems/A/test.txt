@@ -1,0 +1,33 @@
+import jade.core.Agent;
+import jade.core.AID;
+import jade.core.behaviours.*;
+import jade.lang.acl.ACLMessage;
+
+public class aClass extends Agent {
+    @Override
+    protected void setup() {
+        System.out.println("Привет! агент " + getAID().getName() + " готов.");
+
+        // Задаем идентификатор агента, которому будет отправлено сообщение "Ping"
+        AID pongAgent = new AID("pongagent", AID.ISLOCALNAME);
+
+        // Отправляем "Ping" и ждем "Pong"
+        addBehaviour(new OneShotBehaviour() {
+            @Override
+            public void action() {
+                // Создаем сообщение "Ping"
+                ACLMessage ping = new ACLMessage(ACLMessage.INFORM);
+                ping.addReceiver(pongAgent);
+                ping.setContent("Ping");
+                System.out.println(" – " + getLocalName() + " отправил: " + ping.getContent());
+                send(ping);
+
+                // Ожидаем ответ "Pong"
+                ACLMessage reply = blockingReceive();
+                if (reply != null && "Pong".equals(reply.getContent())) {
+                    System.out.println(" – " + getLocalName() + " получил: " + reply.getContent());
+                }
+            }
+        });
+    }
+}

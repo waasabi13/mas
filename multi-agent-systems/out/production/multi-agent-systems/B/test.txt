@@ -1,0 +1,28 @@
+import jade.core.Agent;
+import jade.core.behaviours.*;
+import jade.lang.acl.ACLMessage;
+
+public class bClass extends Agent {
+    @Override
+    protected void setup() {
+        System.out.println("Привет! агент " + getAID().getName() + " готов.");
+
+        // Поведение для ожидания сообщения "Ping"
+        addBehaviour(new CyclicBehaviour() {
+            @Override
+            public void action() {
+                ACLMessage msg = receive();
+                if (msg != null && "Ping".equals(msg.getContent())) {
+                    System.out.println(" – " + getLocalName() + " получил: " + msg.getContent());
+
+                    // Ответ на "Ping" - отправляем "Pong"
+                    ACLMessage reply = msg.createReply();
+                    reply.setContent("Pong");
+                    System.out.println(" – " + getLocalName() + " отправил: " + reply.getContent());
+                    send(reply);
+                }
+                block();  // Ждем следующее сообщение
+            }
+        });
+    }
+}
